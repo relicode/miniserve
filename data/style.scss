@@ -1,8 +1,8 @@
+@use "animate.min.css";
 @use "themes/archlinux" with ($generate_default: false);
 @use "themes/monokai" with ($generate_default: false);
 @use "themes/squirrel" with ($generate_default: false);
 @use "themes/zenburn" with ($generate_default: false);
-@use "animate.min.css";
 
 // theme colors can be found at the bottom
 $themes: squirrel, archlinux, monokai, zenburn;
@@ -361,10 +361,12 @@ th span.active span {
     color: var(--download_button_link_color);
 }
 
-.download a {
+.download a,
+.download > button {
     background: var(--download_button_background);
-    padding: 0.5rem;
     border-radius: 0.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
 }
 
 .download a:hover {
@@ -372,7 +374,8 @@ th span.active span {
     color: var(--download_button_link_color_hover);
 }
 
-.download a:not(:last-of-type) {
+.download a:not(:last-of-type),
+.download > button:not(:last-of-type) {
     margin-right: 1rem;
 }
 

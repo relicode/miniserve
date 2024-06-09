@@ -98,10 +98,9 @@ pub fn page(
                         }
                     }
                     div.toolbar {
-                        div {
-                            button id="copy-links-for-cli" type="button" { "Copy links for CLI" }
-                            " "
-                            button id="copy-links-for-m3u" type="button" { "Copy links for .m3u" }
+                        div.download {
+                            button id="copy-links-for-cli" { "Copy links for CLI" }
+                            button id="copy-links-for-m3u" { "Copy links for .m3u" }
                         }
 
                         @if conf.tar_enabled || conf.tar_gz_enabled || conf.zip_enabled {
@@ -642,7 +641,9 @@ fn page_header(title: &str, file_upload: bool, favicon_route: &str, css_route: &
 
                         copyFileLinks = async (forCli) => {
                             const elements = document.querySelectorAll('a.file')
-                            const content = forCli ? [...elements].map((a) => `'${a.href}'`).join(' ') : [...elements].map((a) => a.href).join('\n')
+                            const content = forCli
+                                ? [...elements].map((a) => `'${new URL(a.href).toString()}'`).join(' ')
+                                : [...elements].map((a) => new URL(a.href).toString()).join('\n')
                             await writeClipboardText(content).then(() => {
                                 showMessage(`Copied ${elements.length} URLs`)
                             })
@@ -651,7 +652,6 @@ fn page_header(title: &str, file_upload: bool, favicon_route: &str, css_route: &
                         copyM3UButton.addEventListener('click', copyFileLinks.bind(null, false))
                         copyCLIButton.addEventListener('click', copyFileLinks.bind(null, true))
                     }, { once: true })
-
                 </script>
             "#))
 
