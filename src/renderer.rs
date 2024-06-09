@@ -57,6 +57,10 @@ pub fn page(
 
             body #drop-container
             {
+                div
+                    id="fading-message"
+                    style="font-size: 24px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+
                 div.toolbar_box_group {
                     @if conf.file_upload {
                         div.drag-form {
@@ -94,6 +98,12 @@ pub fn page(
                         }
                     }
                     div.toolbar {
+                        div {
+                            button id="copy-links-for-cli" type="button" { "Copy links for CLI" }
+                            " "
+                            button id="copy-links-for-m3u" type="button" { "Copy links for .m3u" }
+                        }
+
                         @if conf.tar_enabled || conf.tar_gz_enabled || conf.zip_enabled {
                             div.download {
                                 @for archive_method in ArchiveMethod::iter() {
@@ -608,6 +618,40 @@ fn page_header(title: &str, file_upload: bool, favicon_route: &str, css_route: &
                     addEventListener("load", loadColorScheme);
                     // load saved theme when local storage is changed (synchronize between tabs)
                     addEventListener("storage", loadColorScheme);
+
+                    window.addEventListener('load', () => {
+                        const copyCLIButton = document.getElementById('copy-links-for-cli')
+                        const copyM3UButton = document.getElementById('copy-links-for-m3u')
+                        const messageContainer = document.getElementById('fading-message')
+
+                        async function writeClipboardText(text) {
+                            try {
+                              await navigator.clipboard.writeText(text)
+                            } catch (error) {
+                              console.error(error.message)
+                            }
+                        }
+
+                        showMessage = (message) => {
+                            const spanElem = document.createElement('span')
+                            spanElem.classList.add('animate__animated', 'animate__slow', 'animate__fadeOutUp')
+                            spanElem.innerText = message
+                            spanElem.addEventListener('animationend', (ev) => ev.target.remove(), { once: true })
+                            messageContainer.appendChild(spanElem)
+                        }
+
+                        copyFileLinks = async (forCli) => {
+                            const elements = document.querySelectorAll('a.file')
+                            const content = forCli ? [...elements].map((a) => `'${a.href}'`).join(' ') : [...elements].map((a) => a.href).join('\n')
+                            await writeClipboardText(content).then(() => {
+                                showMessage(`Copied ${elements.length} URLs`)
+                            })
+                        }
+
+                        copyM3UButton.addEventListener('click', copyFileLinks.bind(null, false))
+                        copyCLIButton.addEventListener('click', copyFileLinks.bind(null, true))
+                    }, { once: true })
+
                 </script>
             "#))
 
