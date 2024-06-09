@@ -2,6 +2,7 @@
 @use "themes/monokai" with ($generate_default: false);
 @use "themes/squirrel" with ($generate_default: false);
 @use "themes/zenburn" with ($generate_default: false);
+@use "animate.min.css";
 
 // theme colors can be found at the bottom
 $themes: squirrel, archlinux, monokai, zenburn;
